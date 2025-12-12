@@ -1,10 +1,10 @@
-# Sistema de Notificações Delivery - PHP 7.1.1
+# Worker-NotificacoesPHP - Sistema de Notificações Delivery
 
-Sistema de notificações push para delivery, totalmente compatível com PHP 7.1.1.
+Sistema de automação para enviar notificações push via Firebase, otimizado e compatível com PHP 7.1.1.
 
 ## Estrutura
 
-```
+```text
 NotificacoesDeliveryPHP/
 ├── src/
 │   ├── Config/
@@ -16,87 +16,94 @@ NotificacoesDeliveryPHP/
 │   ├── Security/
 │   │   └── JwtAuth.php           # Autenticação JWT
 │   └── Services/
-│       └── FirebaseService.php    # Serviço Firebase
-├── index.php                      # API principal
-├── sync.php                       # Endpoint de sincronização
-├── worker.php                     # Worker de notificações
-└── composer.json                  # Dependências
-```
+│       └── FirebaseService.php   # Serviço Firebase
+├── index.php                     # API principal
+├── sync.php                      # Endpoint de sincronização
+├── worker.php                    # Worker de notificações
+└── composer.json                 # Dependências
+Instalação
+Instalar dependências:
 
-## Instalação
+Bash
 
-1. Instalar dependências:
-```bash
 composer install
-```
+Configurar variáveis de ambiente (criar arquivo .env baseado no exemplo abaixo):
 
-2. Configurar variáveis de ambiente (criar arquivo `.env`):
-```
-DB_HOST=192.168.1.122
+Ini, TOML
+
+DB_HOST=127.0.0.1
+DB_NAME=seu_banco
 DB_USER=root
-DB_PASSWORD=
-AUTH0_AUDIENCE=https://api-delivery.com
-AUTH0_ISSUER_BASE_URL=https://dev-bj0bt4o68ttf3egu.us.auth0.com/
+DB_PASSWORD=sua_senha
+AUTH0_AUDIENCE=[https://sua-api.com](https://sua-api.com)
+AUTH0_ISSUER_BASE_URL=[https://seu-tenant.us.auth0.com/](https://seu-tenant.us.auth0.com/)
 FIREBASE_PROJECT_ID=seu-project-id
 GOOGLE_CREDENTIALS_PATH=./firebase-credentials.json
-```
+Colocar o arquivo firebase-credentials.json na raiz do projeto.
 
-3. Colocar arquivo `firebase-credentials.json` na raiz do projeto.
+Uso
+Endpoint de Sincronização
+URL: http://localhost/NotificacoesDeliveryPHP/sync.php
 
-## Uso
+Método: POST
 
-### Endpoint de Sincronização
-- URL: `http://localhost/NotificacoesDeliveryPHP/sync.php`
-- Método: POST
-- Headers: `Authorization: Bearer {token}`
-- Body: `{"fcmToken": "token_do_firebase"}`
+Headers: Authorization: Bearer {token}
 
-### Worker de Notificações
+Body: {"fcmToken": "token_do_firebase"}
 
+Worker de Notificações
 O worker fica rodando em loop verificando pedidos pendentes a cada 5 segundos.
 
-**Executar diretamente:**
-```bash
+Executar diretamente:
+
+Bash
+
 php worker.php
-```
+Executar em background (Windows):
 
-**Executar em background (Windows):**
+Opção 1 (Recomendado): Duplo clique em start-worker-hidden.bat (sem janela visível).
 
-**Opção 1 - Rodar escondido (Recomendado - sem janela visível):**
-- Duplo clique em `start-worker-hidden.bat` para iniciar escondido
-- Duplo clique em `stop-worker.bat` para parar
-- O worker roda completamente escondido (sem janela)
+Opção 2: Duplo clique em start-worker.bat (minimizado).
 
-**Opção 2 - Rodar minimizado:**
-- Duplo clique em `start-worker.bat` para iniciar minimizado
-- Duplo clique em `stop-worker.bat` para parar
+Parar o processo: Duplo clique em stop-worker.bat.
 
-**Opção 3 - Usar PowerShell:**
-```powershell
-.\start-worker.ps1    # Iniciar
+Opção 3 - Usar PowerShell:
+
+PowerShell
+
+.\start-worker.ps1     # Iniciar
 .\stop-worker.ps1      # Parar
-```
+Executar em background (Linux):
 
-**Opção 4 - Manual:**
-```bash
-start /MIN php worker.php
-```
+Bash
 
-**Executar em background (Linux):**
-```bash
 nohup php worker.php > /dev/null 2>&1 &
-```
+O que o worker faz:
 
-**O que o worker faz:**
-1. Procura bancos de dados com padrão `delivery_%`
-2. Busca pedidos com `pedidoEnviado IS NOT NULL` e `notificacao_enviada IS NULL`
-3. Envia notificação Firebase para cada pedido
-4. Atualiza `notificacao_enviada = NOW()` após sucesso
-5. Repete a cada 5 segundos
+Procura bancos de dados com padrão delivery_%.
 
-## Compatibilidade
+Busca pedidos com pedidoEnviado IS NOT NULL e notificacao_enviada IS NULL.
 
-- PHP 7.1.1+
-- MySQL 5.7+
-- Extensões PHP necessárias: PDO, cURL, JSON, OpenSSL
+Envia notificação Firebase para cada pedido.
 
+Atualiza notificacao_enviada = NOW() após sucesso.
+
+Repete a cada 5 segundos.
+
+Compatibilidade
+PHP 7.1.1+
+
+MySQL 5.7+
+
+Extensões PHP necessárias: PDO, cURL, JSON, OpenSSL
+
+
+---
+
+### O que fazer agora?
+Depois de salvar o arquivo com o conteúdo acima, você precisa rodar os comandos no terminal para confirmar essa mudança, já que você editou o arquivo:
+
+```bash
+git add README.md
+git commit -m "Corrigindo README e removendo dados sensiveis"
+git push
